@@ -1,104 +1,116 @@
-const mongoose = require('mongoose');
-const { type } = require('os');
+const mongoose = require("mongoose");
 
-//schema 
+//schema
 
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema(
+  {
     username: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     email: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     username: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     role: {
-        type: String,
-        required: true,
-        enum: ["user", "admin"],
-        default: ["user"]
+      type: String,
+      required: true,
+      enum: ["user", "admin"],
+      default: ["user"],
     },
     password: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     lastLogin: {
-        type: Date,
-        default: Date.now(),
+      type: Date,
+      default: Date.now(),
     },
     isVerified: {
-        type: String,
-        default: false,
+      type: String,
+      default: false,
     },
     accountLevel: {
-        type: String,
-        enum: ["bronze", "silver", "goled"],
-        default: "bronze",
+      type: String,
+      enum: ["bronze", "silver", "goled"],
+      default: "bronze",
     },
     profilePicture: {
-        type: String,
-        default: "",
+      type: String,
+      default: "",
     },
     coverImage: {
-        type: String,
-        default: "",
+      type: String,
+      default: "",
     },
     bio: {
-        type: String,
+      type: String,
     },
     location: {
-        type: String,
+      type: String,
     },
     notificationPreference: {
-        email: { type: String, default: true },
-        //..other notifications (sms)
+      email: { type: String, default: true },
+      //..other notifications (sms)
     },
     gender: {
-        type: String,
-        enum: ["male", "female", "prefer not to say", "non-binary"],
+      type: String,
+      enum: ["male", "female", "prefer not to say", "non-binary"],
     },
-    profileViewers: [{
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "User"
-    }],
-    followers: [{
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "User"
-    }],
-    blockedUsers: [{
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "User"
-    }],
-    posts: [{
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "Post"
-    }],
-    likedPosts: [{
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "Post"
-    }],
+    profileViewers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    followers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    blockedUsers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    posts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post",
+      },
+    ],
+    likedPosts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post",
+      },
+    ],
     passwordResetToken: {
-        type: String,
+      type: String,
     },
     passwordResetExpires: {
-        type: Date,
+      type: Date,
     },
     accountVerificationToken: {
-        type: String,
+      type: String,
     },
     accountVerificationExpires: {
-        type: Date,
+      type: Date,
     },
-}, {
+  },
+  {
     timestamps: true,
-});
+  }
+);
 
 //compile schema to model
 
-const user = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
 
 module.exports = User;
