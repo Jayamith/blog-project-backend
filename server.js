@@ -6,6 +6,9 @@ require('./config/database')();
 //!Server
 const app = express();
 
+// Middlewares
+app.use(express.json());
+
 // Routes
 app.use('/', userRouter);
 
