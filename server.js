@@ -1,6 +1,7 @@
 const http = require('http');
 const express = require('express');
 const userRouter = require('./routes/users/userRouter');
+const isLoggedIn = require('./middlewares/isLoggedIn');
 require('./config/database')();
 
 //!Server
@@ -10,7 +11,7 @@ const app = express();
 app.use(express.json());
 
 // Routes
-app.use('/', userRouter);
+app.use('/api/v1/users', isLoggedIn, userRouter);
 
 const server = http.createServer(app);
 

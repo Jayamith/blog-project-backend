@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const User = require("../../model/User/User");
+const generateToken = require("../../utils/generateToken");
 
 // @desc register a new user
 // @route api/v1/users/register
@@ -73,6 +74,31 @@ exports.login = async (req, res) => {
     await user.save();
     res.json({
       status: "success",
+      email: user?.email,
+      _id: user?._id,
+      username: user?.username,
+      role: user?.role,
+      token: generateToken(user),
+    });
+  } catch (error) {
+    res.json({
+      status: "failed",
+      message: error?.message,
+    });
+  }
+};
+
+// @desc user profile
+// @route api/v1/users/profile/:id
+// @access private
+
+exports.profile = async (req, res) => {
+  try {
+    const Id = req.userAuth?._id;
+    const user = await User.findById(Id);
+    res.json({
+      status: "success",
+      message: "Get Profile",
       user,
     });
   } catch (error) {
