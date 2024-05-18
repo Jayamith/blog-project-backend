@@ -7,7 +7,7 @@ const isLoggedIn = (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
 
     //? Verify the token
-    jwt.verify(token, 'fgghdrtstyse3$^$#$@DDAFgdggzsdfsxd.//fyts4', async (err, decoded) => {
+    jwt.verify(token, process.env.JWT_KEY , async (err, decoded) => {
         
         const userId = decoded?.user?.id;
 
@@ -16,10 +16,9 @@ const isLoggedIn = (req, res, next) => {
         req.userAuth = user;
 
         if(err) {
-            return 'Invalid Token';
+            const err = new Error('Invalid Token / Expired!')
+            next(err);
         } else {
-            //* Save the user
-            //! send the user
             next();
         }
     });
