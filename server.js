@@ -6,6 +6,8 @@ const express = require('express');
 const userRouter = require('./routes/users/userRouter');
 const { notFoundError, globalErrHandler } = require('./middlewares/globalErrorHandler');
 const categoryRouter = require('./routes/categories/categoryRouter');
+const postRouter = require("./routes/posts/postRouter");
+const commentRouter = require("./routes/comments/commentRouter");
 require('./config/database')();
 
 //!Server
@@ -17,6 +19,8 @@ app.use(express.json());
 // Routes
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/categories', categoryRouter);
+app.use('/api/v1/posts', postRouter);
+app.use('/api/v1/comments', commentRouter);
 
 // ? Not Found Middleware
 app.use(notFoundError);

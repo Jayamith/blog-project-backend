@@ -16,7 +16,7 @@ exports.createCategory = asyncHandler(async (req, res) => {
     author: req.userAuth?._id,
   });
 
-  res.status(401).json({
+  res.status(201).json({
     status: "success",
     message: "Category created successfully!",
     category,
@@ -26,7 +26,7 @@ exports.createCategory = asyncHandler(async (req, res) => {
 exports.getCategories = asyncHandler(async (req, res) => {
   const categories = await Category.find({});
 
-  res.status(401).json({
+  res.status(200).json({
     status: "success",
     message: "Category List Retrieved Successfully!",
     categories,
