@@ -33,10 +33,6 @@ exports.register = asyncHandler(async (req, res) => {
   res.status(201).json({
     status: "Success",
     message: "User Registered Successfully",
-    //   _id: newUser?._id,
-    //   username: newUser?.username,
-    //   email: newUser?.email,
-    //   role: newUser?.role,
     newUser,
   });
 });
@@ -86,5 +82,138 @@ exports.profile = asyncHandler(async (req, res, next) => {
     status: "success",
     message: "Get Profile",
     user,
+  });
+});
+
+exports.blockUser = asyncHandler(async (req, res) => {
+  const currentUserId = req.userAuth?._id;
+  const blockingUserId = req.params.blockUserId;
+
+  const userToBlock = await User.findById(blockingUserId);
+
+  if (!userToBlock) {
+    throw new Error("No User Found to Block");
+  }
+
+  if (currentUserId.toString() === blockingUserId.toString()) {
+    throw new Error("Can not block yourself");
+  }
+
+  const currentUser = await User.findById(currentUserId);
+
+  if (currentUser?.blockedUsers?.includes(blockingUserId)) {
+    throw new Error("User already blocked!");
+  }
+
+  currentUser?.blockedUsers.push(blockingUserId);
+
+  await currentUser.save();
+
+  res.json({
+    status: "success",
+    message: "User Blocked Successfully!",
+  });
+});
+
+exports.unblockUser = asyncHandler(async (req, res) => {
+  const currentUserId = req.userAuth?._id;
+  const unblockingUserId = req.params.unblockUserId;
+
+  const userToBeUnBlock = await User.findById(unblockingUserId);
+
+  if (!userToBeUnBlock) {
+    throw new Error("No User Found to Be UnBlocked!");
+  }
+
+  const currentUser = await User.findById(currentUserId);
+
+  if (!currentUser?.blockedUsers?.includes(unblockingUserId)) {
+    throw new Error("User not blocked!");
+  }
+
+  currentUser?.blockedUsers ==
+    currentUser?.blockedUsers.filter(
+      (id) => id.toString() !== unblockingUserId.toString()
+    );
+
+  await currentUser.save();
+
+  res.json({
+    status: "success",
+    message: "User UnBlocked Successfully!",
+  });
+});
+
+exports.viewProfile = asyncHandler(async (req, res) => {
+  const currentUserId = req.userAuth?._id;
+  const viewingUserId = req.params.viewUserId;
+
+  const userProfile = await User.findById(viewingUserId);
+
+  const currentUser = await User.findById(currentUserId);
+
+  userProfile.profileViewers.push(currentUserId);
+
+  await userProfile.save();
+
+  res.json({
+    status: "success",
+    message: "You have Viewed profile Successfully!",
+  });
+});
+
+exports.followUser = asyncHandler(async (req, res) => {
+  const currentUserId = req.userAuth?._id;
+  const userToFollowId = req.params.followUserId;
+
+  await User.findByIdAndUpdate(
+    currentUserId,
+    {
+      $addToSet: { following: userToFollowId },
+    },
+    {
+      new: true,
+    }
+  );
+
+  await User.findByIdAndUpdate(
+    userToFollowId,
+    {
+      $addToSet: { followers: currentUserId },
+    },
+    { new: true }
+  );
+
+  res.json({
+    status: "success",
+    message: "User Following Successful!",
+  });
+});
+
+exports.unFollowUser = asyncHandler(async (req, res) => {
+  const currentUserId = req.userAuth?._id;
+  const userToUnfollowId = req.params.unfollowUserId;
+
+  await User.findByIdAndUpdate(
+    currentUserId,
+    {
+      $pull: { following: userToUnfollowId },
+    },
+    {
+      new: true,
+    }
+  );
+
+  await User.findByIdAndUpdate(
+    userToUnfollowId,
+    {
+      $pull: { followers: currentUserId },
+    },
+    { new: true }
+  );
+
+  res.json({
+    status: "success",
+    message: "User Unfollowed Successfully!",
   });
 });
