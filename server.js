@@ -8,7 +8,9 @@ const { notFoundError, globalErrHandler } = require('./middlewares/globalErrorHa
 const categoryRouter = require('./routes/categories/categoryRouter');
 const postRouter = require("./routes/posts/postRouter");
 const commentRouter = require("./routes/comments/commentRouter");
+const sendEmail = require("./utils/sendEmail");
 require('./config/database')();
+sendEmail('jaytech2222@gmail.com', 'jayjay');
 
 //!Server
 const app = express();
