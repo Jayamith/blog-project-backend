@@ -1,7 +1,9 @@
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const asyncHandler = require("express-async-handler");
 const User = require("../../model/User/User");
 const generateToken = require("../../utils/generateToken");
+const sendEmail = require("../../utils/sendEmail");
 
 // @desc register a new user
 // @route api/v1/users/register
@@ -215,5 +217,59 @@ exports.unFollowUser = asyncHandler(async (req, res) => {
   res.json({
     status: "success",
     message: "User Unfollowed Successfully!",
+  });
+});
+
+exports.forgetPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const userFound = await User.findOne({ email });
+
+  if (!userFound) {
+    throw new Error("No Such User Found!");
+  }
+
+  // create token
+  const resetToken = await userFound.generatePasswordResetToken();
+
+  await userFound.save();
+
+  sendEmail(email, resetToken);
+
+  res.status(200).json({
+    message: "Password Reset Email Sent!",
+    resetToken,
+  });
+});
+
+exports.resetPassword = asyncHandler(async (req, res) => {
+  const { resetToken } = req.params;
+  const { password } = req.body;
+
+  // convert token to actual token which is in db
+
+  const cryptoToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  const userFound = await User.findOne({
+    passwordResetToken: cryptoToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  if (!userFound) {
+    throw new Error("Password Reset Token is Invalid or Expired!");
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  userFound.password = await bcrypt.hash(password, salt);
+  userFound.passwordResetToken = undefined;
+  userFound.passwordResetExpires = undefined;
+
+  await userFound.save();
+
+  res.status(200).json({
+    message: "Password Reset Successful!",
   });
 });

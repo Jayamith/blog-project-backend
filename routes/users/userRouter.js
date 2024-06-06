@@ -1,5 +1,5 @@
 const express =  require('express');
-const { register, login, profile, blockUser, unblockUser, viewProfile, followUser, unFollowUser } = require('../../controllers/users/userController');
+const { register, login, profile, blockUser, unblockUser, viewProfile, followUser, unFollowUser, forgetPassword, resetPassword } = require('../../controllers/users/userController');
 const isLoggedIn = require('../../middlewares/isLoggedIn');
 
 const userRouter =  express.Router();
@@ -14,6 +14,10 @@ userRouter.get('/profile/', isLoggedIn, profile);
 userRouter.put('/block/:blockUserId', isLoggedIn, blockUser);
 //*UnBlock User
 userRouter.put('/unblock/:unblockUserId', isLoggedIn, unblockUser);
+//*Forgot Password 
+userRouter.put('/forget-password', forgetPassword);
+//*Reset Password 
+userRouter.put('/reset-password/resetToken', resetPassword);
 //*View Profile
 userRouter.get('/view_profile/:viewUserId', isLoggedIn, viewProfile);
 //*Follow User
