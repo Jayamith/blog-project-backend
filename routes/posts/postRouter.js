@@ -6,6 +6,7 @@ const {
   updatePost,
   deletePost,
   getPost,
+  likePost,
 } = require("../../controllers/posts/postController");
 
 const postRouter = express.Router();
@@ -24,5 +25,8 @@ postRouter.put("/:id", isLoggedIn, updatePost);
 
 //*Delete post
 postRouter.delete("/:id", isLoggedIn, deletePost);
+
+//*Like post
+postRouter.put("/likes/:id", isLoggedIn, likePost);
 
 module.exports = postRouter;

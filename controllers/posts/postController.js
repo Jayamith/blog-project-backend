@@ -89,3 +89,35 @@ exports.updatePost = asyncHandler(async (req, res) => {
     post,
   });
 });
+
+exports.likePost = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const userId = req.userAuth?._id;
+
+  const post = await Post.findById(id);
+
+  if (!post) {
+    throw new Error("Post Not Found!");
+  }
+
+  await Post.findByIdAndUpdate(
+    id,
+    {
+      $addToSet: { likes: userId },
+    },
+    {
+      new: true,
+    }
+  );
+
+  post.dislikes = post.dislikes.filter(
+    (dislike) => dislike.toString !== userId.toString
+  );
+
+  res.status(200).json({
+    status: "success",
+    message: "Post Liked Successfully!",
+    post,
+  });
+});
