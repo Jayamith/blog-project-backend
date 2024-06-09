@@ -153,3 +153,29 @@ exports.dislikePost = asyncHandler(async (req, res) => {
     post,
   });
 });
+
+exports.clapPost = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const post = await Post.findById(id);
+
+  if (!post) {
+    throw new Error("Post Not Found!");
+  }
+
+  await Post.findByIdAndUpdate(
+    id,
+    {
+      $inc: { claps: 1 },
+    },
+    {
+      new: true,
+    }
+  );
+
+  res.status(200).json({
+    status: "success",
+    message: "Post Clapped Successfully!",
+    post,
+  });
+});

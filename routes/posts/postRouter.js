@@ -8,6 +8,7 @@ const {
   getPost,
   likePost,
   dislikePost,
+  clapPost,
 } = require("../../controllers/posts/postController");
 
 const postRouter = express.Router();
@@ -32,5 +33,8 @@ postRouter.put("/likes/:id", isLoggedIn, likePost);
 
 //*Dislike post
 postRouter.put("/dislikes/:id", isLoggedIn, dislikePost);
+
+//*Clap post
+postRouter.put("/claps/:id", isLoggedIn, clapPost);
 
 module.exports = postRouter;
