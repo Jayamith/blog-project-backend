@@ -49,7 +49,19 @@ exports.createPost = asyncHandler(async (req, res) => {
 });
 
 exports.getPosts = asyncHandler(async (req, res) => {
-  const posts = await Post.find({}).populate("comments");
+  //! find all users who have blocked the logged in user
+  const loggedInUser = req.userAuth?._id;
+
+  const usersWhoBlockedCurrentUser = await User.find({
+    blockedUsers: loggedInUser,
+  });
+
+  // * Get thoses user ids
+  const blockingUsersIds = usersWhoBlockedCurrentUser?.map((user) => user?._id);
+
+  const posts = await Post.find({
+    author: { $nin: blockingUsersIds },
+  }).populate("comments");
 
   res.status(200).json({
     status: "success",
