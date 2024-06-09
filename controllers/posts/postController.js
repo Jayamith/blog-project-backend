@@ -114,10 +114,42 @@ exports.likePost = asyncHandler(async (req, res) => {
   post.dislikes = post.dislikes.filter(
     (dislike) => dislike.toString !== userId.toString
   );
+  await post.save();
 
   res.status(200).json({
     status: "success",
     message: "Post Liked Successfully!",
+    post,
+  });
+});
+
+exports.dislikePost = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const userId = req.userAuth?._id;
+
+  const post = await Post.findById(id);
+
+  if (!post) {
+    throw new Error("Post Not Found!");
+  }
+
+  await Post.findByIdAndUpdate(
+    id,
+    {
+      $addToSet: { dislikes: userId },
+    },
+    {
+      new: true,
+    }
+  );
+
+  post.likes = post.likes.filter((like) => like.toString !== userId.toString);
+  await post.save();
+
+  res.status(200).json({
+    status: "success",
+    message: "Post Disliked Successfully!",
     post,
   });
 });
