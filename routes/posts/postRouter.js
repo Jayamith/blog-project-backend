@@ -9,6 +9,7 @@ const {
   likePost,
   dislikePost,
   clapPost,
+  scheduledPost,
 } = require("../../controllers/posts/postController");
 
 const postRouter = express.Router();
@@ -36,5 +37,8 @@ postRouter.put("/dislikes/:id", isLoggedIn, dislikePost);
 
 //*Clap post
 postRouter.put("/claps/:id", isLoggedIn, clapPost);
+
+//*Post Schedule
+postRouter.put("/schedule/:postId", isLoggedIn, scheduledPost);
 
 module.exports = postRouter;

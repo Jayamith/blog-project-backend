@@ -179,3 +179,38 @@ exports.clapPost = asyncHandler(async (req, res) => {
     post,
   });
 });
+
+exports.scheduledPost = asyncHandler(async (req, res) => {
+  const { schedulePublish } = req.body;
+  const { postId } = req.params;
+
+  if (!postId || !schedulePublish) {
+    throw new Error("Post ID and schedule date are required!");
+  }
+
+  const post = await Post.findById(postId);
+
+  if (!post) {
+    throw new Error("Post Not Found!");
+  }
+
+  if (post.author?.toString() !== req.userAuth?._id) {
+    throw new Error("You can schedule your own posts only!");
+  }
+
+  const scheduleDate = new Date(schedulePublish);
+  const currentDate = new Date();
+
+  if (scheduleDate < currentDate) {
+    throw new Error("Schedule publish day cannot be in the past!");
+  }
+
+  post.scheduledPublish = schedulePublish;
+  await post.save();
+
+  res.status(200).json({
+    status: "success",
+    message: "Post Scheduled Successfully!",
+    post,
+  });
+});
