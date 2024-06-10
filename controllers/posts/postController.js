@@ -17,6 +17,7 @@ exports.createPost = asyncHandler(async (req, res) => {
     content,
     category: categoryId,
     author: req?.userAuth?._id,
+    image: req?.file?.path,
   });
 
   // * Assign to User
