@@ -80,7 +80,28 @@ exports.login = asyncHandler(async (req, res) => {
 
 exports.profile = asyncHandler(async (req, res, next) => {
   const Id = req.userAuth?._id;
-  const user = await User.findById(Id);
+  const user = await User.findById(Id)
+    .populate({
+      path: "posts",
+      model: "Post",
+    })
+    .populate({
+      path: "following",
+      model: "User",
+    })
+    .populate({
+      path: "followers",
+      model: "UserF",
+    })
+    .populate({
+      path: "blockedUsers",
+      model: "User",
+    })
+    .populate({
+      path: "profileViewers",
+      model: "User",
+    });
+
   res.json({
     status: "success",
     message: "Get Profile",

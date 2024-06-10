@@ -51,6 +51,7 @@ exports.createPost = asyncHandler(async (req, res) => {
 exports.getPosts = asyncHandler(async (req, res) => {
   //! find all users who have blocked the logged in user
   const loggedInUser = req.userAuth?._id;
+  const currentTime = new Date();
 
   const usersWhoBlockedCurrentUser = await User.find({
     blockedUsers: loggedInUser,
@@ -61,7 +62,17 @@ exports.getPosts = asyncHandler(async (req, res) => {
 
   const posts = await Post.find({
     author: { $nin: blockingUsersIds },
-  }).populate("comments");
+    $or: [
+      {
+        scheduledPublish: { $lte: currentTime },
+        scheduledPublish: null,
+      },
+    ],
+  }).populate({
+    path: "author",
+    model: "User",
+    select: "username email role",
+  });
 
   res.status(200).json({
     status: "success",
