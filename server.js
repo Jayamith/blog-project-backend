@@ -3,6 +3,7 @@ dotenv.config();
 
 const http = require('http');
 const express = require('express');
+const cors =  require("cors");
 const userRouter = require('./routes/users/userRouter');
 const { notFoundError, globalErrHandler } = require('./middlewares/globalErrorHandler');
 const categoryRouter = require('./routes/categories/categoryRouter');
@@ -16,7 +17,7 @@ const app = express();
 
 // Middlewares
 app.use(express.json());
-
+app.use(cors());
 // Routes
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/categories', categoryRouter);

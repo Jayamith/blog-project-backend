@@ -11,6 +11,7 @@ const {
   dislikePost,
   clapPost,
   scheduledPost,
+  getPublicPosts,
 } = require("../../controllers/posts/postController");
 const storage = require("../../utils/fileUpload");
 
@@ -25,11 +26,14 @@ postRouter.post("/", isLoggedIn, upload.single("file"), createPost);
 //*Get all posts
 postRouter.get("/", getPosts);
 
+//*Get all public posts
+postRouter.get("/public", getPublicPosts);
+
 //*Get post
 postRouter.get("/:id", getPost);
 
 //*Update post
-postRouter.put("/:id", isLoggedIn, updatePost);
+postRouter.put("/:id", isLoggedIn, upload.single("file"), updatePost);
 
 //*Delete post
 postRouter.delete("/:id", isLoggedIn, deletePost);

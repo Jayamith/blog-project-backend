@@ -69,11 +69,13 @@ exports.getPosts = asyncHandler(async (req, res) => {
         scheduledPublish: null,
       },
     ],
-  }).populate({
-    path: "author",
-    model: "User",
-    select: "username email role",
-  });
+  })
+    .populate({
+      path: "author",
+      model: "User",
+      select: "username email role",
+    })
+    .populate("category");
 
   res.status(200).json({
     status: "success",
@@ -83,7 +85,10 @@ exports.getPosts = asyncHandler(async (req, res) => {
 });
 
 exports.getPost = asyncHandler(async (req, res) => {
-  const post = await Post.findById(req.params.id).populate("comments");
+  const post = await Post.findById(req.params.id)
+    .populate("comments")
+    .populate("author")
+    .populate("category");
 
   res.status(200).json({
     status: "success",
@@ -93,6 +98,14 @@ exports.getPost = asyncHandler(async (req, res) => {
 });
 
 exports.deletePost = asyncHandler(async (req, res) => {
+  const postFound = await Post.findById(req.params.id);
+
+  const isAuthor =
+    req.userAuth?._id?.toString() === postFound?.author?._id?.toString();
+
+  if (!isAuthor) {
+    throw new Error("Action Denied!, You are not the author of this post");
+  }
   await Post.findByIdAndDelete(req.params.id);
 
   res.status(200).json({
@@ -102,15 +115,47 @@ exports.deletePost = asyncHandler(async (req, res) => {
 });
 
 exports.updatePost = asyncHandler(async (req, res) => {
-  const post = await Post.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
+  const { id } = req.params;
+
+  const postFound = await Post.findById(id);
+
+  if (!postFound) {
+    throw new Error("Post not found!");
+  }
+
+  const { title, category, content } = req.body;
+
+  const post = await Post.findByIdAndUpdate(
+    id,
+    {
+      image: req?.file?.path ? req?.file?.path : postFound?.image,
+      title: title ? title : postFound?.title,
+      category: category ? category : postFound?.category,
+      content: content ? content : postFound?.content,
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
 
   res.status(200).json({
     status: "success",
     message: "Post Updated Successfully!",
     post,
+  });
+});
+
+exports.getPublicPosts = asyncHandler(async (req, res) => {
+  const posts = await Post.find({})
+    .sort({ createdAt: -1 })
+    .limit(4)
+    .populate("category");
+
+  res.status(200).json({
+    status: "success",
+    message: "Posts Fetched Successfully!",
+    posts,
   });
 });
 
