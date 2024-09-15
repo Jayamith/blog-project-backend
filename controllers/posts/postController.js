@@ -232,7 +232,7 @@ exports.clapPost = asyncHandler(async (req, res) => {
     throw new Error("Post Not Found!");
   }
 
-  await Post.findByIdAndUpdate(
+  const updatedPost = await Post.findByIdAndUpdate(
     id,
     {
       $inc: { claps: 1 },
@@ -245,7 +245,7 @@ exports.clapPost = asyncHandler(async (req, res) => {
   res.status(200).json({
     status: "success",
     message: "Post Clapped Successfully!",
-    post,
+    updatedPost,
   });
 });
 
@@ -280,6 +280,36 @@ exports.scheduledPost = asyncHandler(async (req, res) => {
   res.status(200).json({
     status: "success",
     message: "Post Scheduled Successfully!",
+    post,
+  });
+});
+
+exports.postViewCount = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const userId = req.userAuth?._id;
+
+  const post = await Post.findById(id);
+
+  if (!post) {
+    throw new Error("Post Not Found!");
+  }
+
+  await Post.findByIdAndUpdate(
+    id,
+    {
+      $addToSet: { postViews: userId },
+    },
+    {
+      new: true,
+    }
+  );
+
+  await post.save();
+
+  res.status(200).json({
+    status: "success",
+    message: "Post Viewed Successfully!",
     post,
   });
 });

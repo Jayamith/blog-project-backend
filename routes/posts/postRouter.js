@@ -12,6 +12,7 @@ const {
   clapPost,
   scheduledPost,
   getPublicPosts,
+  postViewCount,
 } = require("../../controllers/posts/postController");
 const storage = require("../../utils/fileUpload");
 
@@ -49,5 +50,8 @@ postRouter.put("/claps/:id", isLoggedIn, clapPost);
 
 //*Post Schedule
 postRouter.put("/schedule/:postId", isLoggedIn, scheduledPost);
+
+//*View post
+postRouter.put("/post-views/:id", isLoggedIn, postViewCount);
 
 module.exports = postRouter;
