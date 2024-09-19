@@ -86,9 +86,16 @@ exports.getPosts = asyncHandler(async (req, res) => {
 
 exports.getPost = asyncHandler(async (req, res) => {
   const post = await Post.findById(req.params.id)
-    .populate("comments")
     .populate("author")
-    .populate("category");
+    .populate("category")
+    .populate({
+      path: "comments",
+      model: "Comment",
+      populate: {
+        path: "author",
+        select: "username",
+      },
+    });
 
   res.status(200).json({
     status: "success",
